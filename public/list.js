@@ -1,6 +1,6 @@
 // list.js - Fetches and displays student list (FINAL CRUD LOGIC)
 
-const API_URL = 'http://192.168.1.14:3001/api'; 
+const API_URL = 'http://10.75.14.132:3001/api'; 
 const studentListBody = document.getElementById('student-list-body');
 const countNumber = document.getElementById('count-number');
 const loadingMessage = document.getElementById('loading-message');
@@ -21,7 +21,7 @@ const updateInputs = {
     idno: document.getElementById('update-idno'),
     lastName: document.getElementById('updateLastName'),
     firstName: document.getElementById('updateFirstName'),
-    course: document.getElementById('updateCourse'),
+    course: document.getElementById('updateCourse'), // REFERENCES the new <select> element
     yearLevel: document.getElementById('updateYearLevel')
 };
 
@@ -53,7 +53,7 @@ function handleRowClick(student) {
     updateInputs.idno.value = student.idNo;
     updateInputs.lastName.value = student.lastName;
     updateInputs.firstName.value = student.firstName;
-    updateInputs.course.value = student.course;
+    updateInputs.course.value = student.course; // Sets the <select> value correctly
     updateInputs.yearLevel.value = student.level;
 
     // Reset visibility
@@ -147,13 +147,14 @@ document.getElementById('confirm-update-btn').addEventListener('click', async ()
     const updatedData = {
         firstName: updateInputs.firstName.value.trim(),
         lastName: updateInputs.lastName.value.trim(),
-        course: updateInputs.course.value.trim(),
+        course: updateInputs.course.value, // Reads the selected course value
         yearLevel: updateInputs.yearLevel.value.trim()
     };
 
-    if (Object.values(updatedData).some(val => val === '')) {
-         alert('All update fields must be filled.');
-         return;
+    // Validation check
+    if (updatedData.course === "" || !updatedData.yearLevel) {
+        alert('Please select a course and fill in the year level.');
+        return;
     }
     
     try {

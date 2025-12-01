@@ -8,13 +8,9 @@ const path = require('path');
 const app = express();
 const port = 3001;
 
-// --- Middleware ---
-// 1. Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 2. Enable All CORS Requests 
 app.use(cors()); 
-// 3. Parse incoming JSON requests
 app.use(express.json());
 
 // --- Database Setup (SQLite) ---
@@ -23,7 +19,7 @@ const db = new sqlite3.Database('./student_registration.db', (err) => {
         console.error('Error opening database:', err.message);
     } else {
         console.log('Connected to the SQLite database.');
-        // Create table if it doesn't exist
+
         db.run(`CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             idNo TEXT UNIQUE NOT NULL,
@@ -43,28 +39,18 @@ const db = new sqlite3.Database('./student_registration.db', (err) => {
 
 // --- API Routes ---
 
-/**
- * 🚀 GET /api/students
- * Fetches ALL student records for display on list.html (Select *) 
- * and is also used by index.html for counting.
- */
 app.get('/api/students', (req, res) => {
-    // This query fetches all data needed for the list page
+
     const sql = 'SELECT idNo, firstName, lastName, course, level FROM students ORDER BY lastName, firstName'; 
     db.all(sql, [], (err, rows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).json({ success: false, error: 'Database error fetching students.' });
         }
-        // Sends the full list (rows) to the frontend
         res.json({ success: true, students: rows }); 
     });
 });
 
-/**
- * 📝 POST /api/students
- * Registers a new student.
- */
 app.post('/api/students', (req, res) => {
     const { studentId, firstName, lastName, course, yearLevel } = req.body;
 
@@ -93,11 +79,6 @@ app.post('/api/students', (req, res) => {
     });
 });
 
-
-/**
- * 📝 PUT /api/students/:idNo
- * Updates an existing student record based on idNo.
- */
 app.put('/api/students/:idNo', (req, res) => {
     const targetIdNo = req.params.idNo;
     const { firstName, lastName, course, yearLevel } = req.body;
@@ -124,10 +105,6 @@ app.put('/api/students/:idNo', (req, res) => {
     });
 });
 
-/**
- * 🗑️ DELETE /api/students/:idNo
- * Deletes a student record based on idNo.
- */
 app.delete('/api/students/:idNo', (req, res) => {
     const idNoToDelete = req.params.idNo;
 
